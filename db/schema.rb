@@ -10,5 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_07_04_200343) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_04_200343) do
+  create_table "affirmations", force: :cascade do |t|
+    t.text "content", null: false
+    t.date "date", null: false
+    t.string "category", default: "general"
+    t.boolean "favorite", default: false
+    t.text "generated_prompt"
+    t.string "model_used", default: "llama2"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["date", "category"], name: "index_affirmations_on_date_and_category"
+    t.index ["date"], name: "index_affirmations_on_date"
+  end
 end

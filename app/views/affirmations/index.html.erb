@@ -1,0 +1,119 @@
+<div class="max-w-4xl mx-auto p-6">
+  <div class="bg-white rounded-lg shadow-lg p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold text-gray-800">Daily Affirmations</h1>
+      <div class="flex space-x-2">
+        <%= link_to "Generate Today", generate_today_affirmations_path, 
+            method: :post, 
+            class: "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600",
+            confirm: "This will generate new affirmations. Continue?" %>
+        
+        <% if @affirmations.any? %>
+          <%= link_to "Clear Today", clear_today_affirmations_path, 
+              method: :delete, 
+              class: "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600",
+              confirm: "This will delete all of today's affirmations. Continue?" %>
+        <% end %>
+      </div>
+    </div>
+    
+    <!-- Date Navigation -->
+    <div class="mb-6 flex items-center justify-center space-x-4">
+      <%= link_to "← Previous", affirmations_path(date: @date - 1.day), 
+          class: "text-blue-500 hover:text-blue-700" %>
+      
+      <div class="text-lg font-semibold text-gray-700">
+        <%= @date.strftime("%B %d, %Y") %>
+      </div>
+      
+      <% if @date < Date.current %>
+        <%= link_to "Next →", affirmations_path(date: @date + 1.day), 
+            class: "text-blue-500 hover:text-blue-700" %>
+      <% end %>
+    </div>
+    
+    <!-- Category Filter -->
+    <div class="mb-6">
+      <%= form_with url: affirmations_path, method: :get, local: true, class: "flex items-center justify-center space-x-2" do |f| %>
+        <%= f.hidden_field :date, value: @date %>
+        <%= f.select :category, 
+            options_for_select([['All Categories', '']] + @categories.map { |c| [c.titleize, c] }, @selected_category),
+            {}, 
+            { class: "border rounded px-3 py-2", onchange: "this.form.submit();" } %>
+      <% end %>
+    </div>
+    
+    <!-- Affirmations Display -->
+    <% if @affirmations.any? %>
+      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <% @affirmations.each do |affirmation| %>
+          <div class="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg p-6 shadow-md border border-blue-200">
+            <div class="flex justify-between items-start mb-3">
+              <span class="bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                <%= affirmation.category.titleize %>
+              </span>
+              
+              <div class="flex space-x-2">
+                <%= link_to toggle_favorite_affirmation_path(affirmation), 
+                    method: :patch, 
+                    class: "text-yellow-500 hover:text-yellow-600" do %>
+                  <% if affirmation.favorite? %>
+                    ⭐
+                  <% else %>
+                    ☆
+                  <% end %>
+                <% end %>
+                
+                <%= link_to affirmation_path(affirmation), 
+                    method: :delete, 
+                    class: "text-red-500 hover:text-red-600",
+                    confirm: "Delete this affirmation?" do %>
+                  🗑️
+                <% end %>
+              </div>
+            </div>
+            
+            <blockquote class="text-gray-800 font-medium text-lg leading-relaxed">
+              "<%= affirmation.content %>"
+            </blockquote>
+            
+            <div class="mt-4 text-xs text-gray-500">
+              Model: <%= affirmation.model_used %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="text-center py-12">
+        <div class="text-gray-500 text-lg mb-4">
+          No affirmations for <%= @date.strftime("%B %d, %Y") %>
+        </div>
+        
+        <% if @date == Date.current %>
+          <%= link_to "Generate Today's Affirmations", generate_today_affirmations_path, 
+              method: :post, 
+              class: "bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 font-semibold" %>
+        <% end %>
+      </div>
+    <% end %>
+    
+    <!-- Favorites Section -->
+    <% if @favorites.any? %>
+      <div class="mt-12 pt-8 border-t border-gray-200">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">⭐ Your Favorites</h2>
+        <div class="grid gap-3 md:grid-cols-2">
+          <% @favorites.each do |favorite| %>
+            <div class="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+              <div class="text-sm text-yellow-600 mb-1">
+                <%= favorite.category.titleize %> • <%= favorite.date.strftime("%b %d") %>
+              </div>
+              <blockquote class="text-gray-800 font-medium">
+                "<%= favorite.content %>"
+              </blockquote>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
