@@ -3,16 +3,18 @@
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-3xl font-bold text-gray-800">Daily Affirmations</h1>
       <div class="flex space-x-2">
-        <%= link_to "Generate Today", generate_today_affirmations_path, 
-            method: :post, 
-            class: "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600",
-            confirm: "This will generate new affirmations. Continue?" %>
+        <%= form_with url: generate_today_affirmations_path, method: :post, local: true do %>
+          <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" onclick="return confirm('This will generate new affirmations. Continue?')">
+            Generate Today
+          </button>
+        <% end %>
         
         <% if @affirmations.any? %>
-          <%= link_to "Clear Today", clear_today_affirmations_path, 
-              method: :delete, 
-              class: "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600",
-              confirm: "This will delete all of today's affirmations. Continue?" %>
+          <%= form_with url: clear_today_affirmations_path, method: :delete, local: true do %>
+            <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600" onclick="return confirm('This will delete all of today\'s affirmations. Continue?')">
+              Clear Today
+            </button>
+          <% end %>
         <% end %>
       </div>
     </div>
@@ -90,9 +92,11 @@
         </div>
         
         <% if @date == Date.current %>
-          <%= link_to "Generate Today's Affirmations", generate_today_affirmations_path, 
-              method: :post, 
-              class: "bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 font-semibold" %>
+          <%= form_with url: generate_today_affirmations_path, method: :post, local: true do %>
+            <button type="submit" class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 font-semibold">
+              Generate Today's Affirmations
+            </button>
+          <% end %>
         <% end %>
       </div>
     <% end %>
