@@ -1,3 +1,15 @@
+# Installation
+
+Make sure at least one ollama model is pulled and the server is running
+
+`ollama pull llama3.2`
+
+`ollama serve`
+
+Run Rails app:
+
+`rails s`
+
 # GitHub Codespaces ♥️ Ruby on Rails
 
 Welcome to your shiny new Codespace running Rails! We've got everything fired up and running for you to explore Rails.
