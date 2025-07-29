@@ -67,6 +67,8 @@ group :development do
   # gem "spring"
 
   gem "hotwire-livereload", "~> 1.2"
+
+  gem "bundler-audit", require: false
 end
 
 group :test do
