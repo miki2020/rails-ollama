@@ -83,3 +83,5 @@ gem "tailwindcss-rails", "~> 4.3"
 gem "pry", "~> 0.15.2"
 
 gem "brakeman", "~> 7.1"
+
+gem "thor", ">= 1.4.0"
