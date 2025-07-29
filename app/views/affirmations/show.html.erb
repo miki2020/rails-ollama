@@ -1,0 +1,30 @@
+<div class="max-w-4xl mx-auto p-6">
+  <div class="bg-white rounded-lg shadow-lg p-6">
+    <h1 class="text-3xl font-bold text-gray-800">Affirmation Details</h1>
+    <div class="mt-4">
+      <p class="text-lg text-gray-700">Category: <%= @affirmation.category.titleize %></p>
+      <blockquote class="text-gray-800 font-medium text-lg leading-relaxed mt-2">
+        "<%= @affirmation.content %>"
+      </blockquote>
+      <p class="text-sm text-gray-500 mt-2">Generated on: <%= @affirmation.date.strftime("%B %d, %Y") %></p>
+      <p class="text-sm text-gray-500">Model used: <%= @affirmation.model_used %></p>
+    </div>
+    <div class="mt-4">
+      <button onclick="speakText('<%= @affirmation.content %>')" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+        🔊 Speak
+      </button>
+    </div>
+    <div class="mt-6 flex justify-between items-center">
+      <%= link_to "↑ Back to List", affirmations_path(date: @affirmation.date), class: "text-blue-500 hover:text-blue-700" %>
+      <%= link_to "← Previous", affirmation_path(@affirmation.id - 1), class: "text-blue-500 hover:text-blue-700" if Affirmation.exists?(id: @affirmation.id - 1) %>
+      <%= link_to "Next →", affirmation_path(@affirmation.id + 1), class: "text-blue-500 hover:text-blue-700" if Affirmation.exists?(id: @affirmation.id + 1) %>
+    </div>
+  </div>
+</div>
+
+<script>
+  function speakText(text) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    window.speechSynthesis.speak(utterance);
+  }
+</script>
