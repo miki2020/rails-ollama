@@ -25,7 +25,8 @@ class AffirmationsController < ApplicationController
   end
 
   def generate_today
-    selected_model = params[:model] || 'llama3.2:1b'
+  available_models = OllamaService.new.list_models
+  selected_model = params[:model].presence_in(available_models) || available_models.first
     selected_date = params[:date]&.to_date || Date.current
 
     if Affirmation.for_date(selected_date).any?

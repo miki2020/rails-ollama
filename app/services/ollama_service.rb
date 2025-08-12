@@ -20,7 +20,7 @@ class OllamaService
     request['Content-Type'] = 'application/json'
 
     body = {
-      model: model, # Ensure model is correctly included as a string
+      model: model,
       prompt: prompt,
       stream: stream
     }
@@ -68,36 +68,6 @@ class OllamaService
       JSON.parse(response.body)['models'].map { |model| model['name'] }
     else
       raise "Failed to fetch models: #{response.code} - #{response.message}"
-    end
-  end
-
-  private
-
-  def make_request(method, path, body = nil)
-    uri = URI("#{BASE_URL}#{path}")
-
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.read_timeout = 30
-    http.open_timeout = 10
-
-    request = case method
-              when :get
-                Net::HTTP::Get.new(uri)
-              when :post
-                Net::HTTP::Post.new(uri)
-              else
-                raise "Unsupported HTTP method: #{method}"
-              end
-
-    request['Content-Type'] = 'application/json' if body
-    request.body = body.to_json if body
-
-    response = http.request(request)
-
-    if response.is_a?(Net::HTTPSuccess)
-      JSON.parse(response.body)
-    else
-      raise "Ollama API error: #{response.code} - #{response.message}"
     end
   end
 end

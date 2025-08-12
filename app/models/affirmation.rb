@@ -9,7 +9,9 @@ class Affirmation < ApplicationRecord
 
   CATEGORIES = %w[general motivation success health relationships creativity confidence peace].freeze
   SYSTEM_PROMPT = "You are a wise and compassionate life coach who creates powerful, positive affirmations. Keep responses concise and impactful."
-  def self.generate_daily_affirmations(model = 'llama3.2:1b', date = Date.current)
+  def self.generate_daily_affirmations(model = nil, date = Date.current)
+    available_models = OllamaService.new.list_models
+    model = model.presence_in(available_models) || available_models.first
     raise ArgumentError, "model must be a string" unless model.is_a?(String)
 
     categories = CATEGORIES.sample(5)

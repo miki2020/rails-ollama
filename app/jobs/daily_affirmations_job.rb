@@ -1,7 +1,9 @@
 class DailyAffirmationsJob < ApplicationJob
   queue_as :default
 
-  def perform(date = Date.current, model = 'llama3.2:1b')
+  def perform(date = Date.current, model = nil)
+    available_models = OllamaService.new.list_models
+    model = model.presence_in(available_models) || available_models.first
     Rails.logger.info "Starting DailyAffirmationsJob for date: #{date} with model: #{model}"
 
     ollama_service = OllamaService.new
