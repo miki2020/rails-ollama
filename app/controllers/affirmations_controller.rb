@@ -57,6 +57,12 @@ class AffirmationsController < ApplicationController
     redirect_to affirmations_path, notice: "Today's affirmations cleared"
   end
 
+  def clear_day
+    date = params[:date]&.to_date || Date.current
+    Affirmation.for_date(date).destroy_all
+    redirect_to affirmations_path(date: date), notice: "Affirmations for #{date.strftime('%B %d, %Y')} cleared"
+  end
+
   def debug_generate_affirmations
     begin
       Affirmation.generate_daily_affirmations

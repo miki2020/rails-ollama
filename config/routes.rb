@@ -12,6 +12,7 @@ Rails.application.routes.draw do
     collection do
       post :generate_today
       delete :clear_today
+      delete :clear_day
     end
   end
 
