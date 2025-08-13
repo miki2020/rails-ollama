@@ -1,4 +1,5 @@
 class Affirmation < ApplicationRecord
+  belongs_to :user, optional: true
   validates :content, presence: true
   validates :date, presence: true
 
@@ -9,7 +10,9 @@ class Affirmation < ApplicationRecord
 
   CATEGORIES = %w[general motivation success health relationships creativity confidence peace].freeze
   SYSTEM_PROMPT = "You are a wise and compassionate life coach who creates powerful, positive affirmations. Keep responses concise and impactful."
-  def self.generate_daily_affirmations(model = nil, date = Date.current)
+  def self.generate_daily_affirmations(model = nil, date = Date.current, user = nil)
+    raise ArgumentError, "date must be a Date object" unless date.is_a?(Date)
+    raise ArgumentError, "user must be a User object or nil" unless user.nil? || user.is_a?(User)
     available_models = OllamaService.new.list_models
     model = model.presence_in(available_models) || available_models.first
     raise ArgumentError, "model must be a string" unless model.is_a?(String)
@@ -32,6 +35,7 @@ class Affirmation < ApplicationRecord
         affirmation_text = extract_affirmation_from_response(response['response'])
 
         create!(
+          user: user,
           content: affirmation_text,
           date: date,
           category: category,
@@ -109,5 +113,5 @@ class Affirmation < ApplicationRecord
     fallbacks[category.to_sym] || fallbacks[:general]
   end
 
-  after_create_commit { broadcast_append_to "affirmations" }
+  after_create_commit { broadcast_append_to [user,"affirmations"] }
 end

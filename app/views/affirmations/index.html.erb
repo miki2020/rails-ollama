@@ -1,87 +1,172 @@
 <div class="w-full p-0" id="affirmations-container text-white">
   <div class="bg-white shadow-lg rounded-none bg-opacity-50">
     <!-- Sticky Top Navigation Bar -->
-    <nav class="sticky top-0 z-10 w-full left-0 bg-white/50 flex flex-wrap items-center justify-between gap-4 px-4 py-3 shadow-md bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 shadow-lg" >
+    <nav class="sticky top-0 z-10 w-full left-0 bg-white/50 flex flex-wrap items-center justify-between gap-4 px-4 py-3 shadow-md bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 shadow-lg">
       <h1 class="text-2xl md:text-3xl font-bold text-gray-50 mr-4">Daily Affirmations</h1>
-      <!-- Date Navigation -->
-      <div class="flex items-center gap-2">      
-        <%= link_to affirmations_path(date: @date - 1.day), class: "inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:hover:bg-accent/50 h-8 rounded-md gap-1.5 px-3 text-purple-200 hover:text-white hover:bg-white/20" do %>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-left w-4 h-4 mr-1" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
-          <span>Prev</span>
-        <% end %>
-        <div class="text-purple-100 px-3 py-1 bg-white/20 rounded-lg backdrop-blur-sm">
-          <%= @date.strftime("%B %d, %Y") %>
-        </div>
-        <% if @date < Date.current %>
-          <%= link_to affirmations_path(date: @date + 1.day), class: "inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:hover:bg-accent/50 h-8 rounded-md gap-1.5 px-3 text-purple-200 hover:text-white hover:bg-white/20" do %>
-            <span>Next</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 ml-1" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
-          <% end %>
+      
+      <!-- Authentication Links -->
+      <div class="flex items-center gap-4">
+        <% if Current.user %>
+          <span class="text-purple-100 text-sm">Welcome, <%= Current.user.email_address.split('@').first.capitalize %>!</span>
+          <%= button_to "Sign out", session_path, method: :delete, 
+              class: "text-purple-200 hover:text-white text-sm font-medium bg-transparent border-none cursor-pointer p-0" %>
+        <% else %>
+          <div class="flex items-center gap-4 text-sm">
+            <%= link_to "Sign in", new_session_path, 
+                class: "text-purple-200 hover:text-white font-medium" %>
+            <span class="text-purple-300">|</span>
+            <%= link_to "Sign up", new_registration_path, 
+                class: "bg-white/20 text-white px-3 py-1 rounded-md hover:bg-white/30 font-medium backdrop-blur-sm" %>
+          </div>
         <% end %>
       </div>
-      <div class="flex flex-wrap items-center gap-2">
-        <!-- Model Selection -->
-        <%= form_with url: generate_today_affirmations_path, method: :get, local: true, class: " bg-white/20 rounded-lg backdrop-blur-sm flex items-center gap-2 text-white backdrop-blur-sm" do %>
-          <% if @models.present? %>
-            <%= select_tag :model, options_for_select(@models, selected: @selected_model),
-                { class: "border rounded px-3 py-2", onchange: "this.form.submit();" } %>
-          <% else %>
-            <p class="text-red-500">No models available.</p>
+      <% if user_signed_in? %>
+        <!-- Date Navigation (only for logged in users) -->
+        <div class="flex items-center gap-2">      
+          <%= link_to affirmations_path(date: @date - 1.day), class: "inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:hover:bg-accent/50 h-8 rounded-md gap-1.5 px-3 text-purple-200 hover:text-white hover:bg-white/20" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-left w-4 h-4 mr-1" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+            <span>Prev</span>
           <% end %>
-        <% end %>
-                <!-- Clear Today Button -->
-        <% if @affirmations.any? %>
-          <%= form_with url: clear_today_affirmations_path, method: :delete, local: true do %>
-            <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600" onclick="return confirm('This will delete all of today\'s affirmations. Continue?')">
-              Clear Today
+          <div class="text-purple-100 px-3 py-1 bg-white/20 rounded-lg backdrop-blur-sm">
+            <%= @date.strftime("%B %d, %Y") %>
+          </div>
+          <% if @date < Date.current %>
+            <%= link_to affirmations_path(date: @date + 1.day), class: "inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:hover:bg-accent/50 h-8 rounded-md gap-1.5 px-3 text-purple-200 hover:text-white hover:bg-white/20" do %>
+              <span>Next</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 ml-1" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+            <% end %>
+          <% end %>
+        </div>
+        
+        <!-- Controls (only for logged in users) -->
+        <div class="flex flex-wrap items-center gap-2">
+          <!-- Model Selection -->
+          <%= form_with url: generate_today_affirmations_path, method: :get, local: true, class: "bg-white/20 rounded-lg backdrop-blur-sm flex items-center gap-2 text-white backdrop-blur-sm" do %>
+            <% if @models.present? %>
+              <%= select_tag :model, options_for_select(@models, selected: @selected_model),
+                  { class: "border rounded px-3 py-2", onchange: "this.form.submit();" } %>
+            <% else %>
+              <p class="text-red-500">No models available.</p>
+            <% end %>
+          <% end %>
+          
+          <!-- Clear Today Button -->
+          <% if @affirmations&.any? %>
+            <%= form_with url: clear_day_affirmations_path, method: :delete, local: true do %>
+              <%= hidden_field_tag :date, @date %>
+              <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600" onclick="return confirm('This will delete all of today\'s affirmations. Continue?')">
+                Clear this day
+              </button>
+            <% end %>
+          <% end %>
+
+          <!-- Generate Button -->
+          <%= form_with url: generate_today_affirmations_path, method: :post, local: true do %>
+            <%= hidden_field_tag :date, @date %>
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" onclick="return confirm('This will generate affirmations for the selected date. Continue?')">
+              Generate for <%= @date.strftime("%B %d, %Y") %>
             </button>
           <% end %>
-        <% end %>
-
-        <!-- Generate Button -->
-        <%= form_with url: generate_today_affirmations_path, method: :post, local: true do %>
-          <%= hidden_field_tag :date, @date %>
-          <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" onclick="return confirm('This will generate affirmations for the selected date. Continue?')">
-            Generate for <%= @date.strftime("%B %d, %Y") %>
-          </button>
-        <% end %>
-      </div>
+        </div>
+      <% end %>
     </nav>
+    
     <div class="max-w-6xl mx-auto px-6 py-8">
-      <!-- Category Filter -->
-      <div class="flex justify-center mb-8">
-        <%= form_with url: affirmations_path, method: :get, local: true, class: "border-input data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 flex items-center justify-between gap-2 rounded-md px-3 py-2 text-sm whitespace-nowrap transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-9 data-[size=sm]:h-8 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 w-48 bg-white/70 backdrop-blur-sm shadow-lg border-0" do |f| %>
-          <%= f.hidden_field :date, value: @date %>
-          <%= f.select :category,
-              options_for_select([["All Categories", ""]] + @categories.map { |c| [c.titleize, c] }, @selected_category),
-              {},
-              { class: "border rounded px-3 py-2", onchange: "this.form.submit();" } %>
-        <% end %>
-      </div>
-      <!-- Affirmations Display -->
-      <div id="affirmations">
-        <%= turbo_stream_from "affirmations" %>
-        <%= render @affirmations %>
-      </div>
-    </div>
-    <!-- Favorites Section -->
-    <% if @favorites.any? %>
-      <div class="mt-12 pt-8 border-t border-gray-200">
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">⭐ Your Favorites</h2>
-        <div class="grid gap-3 md:grid-cols-2">
-          <% @favorites.each do |favorite| %>
-            <div class="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
-              <div class="text-sm text-yellow-600 mb-1">
-                <%= favorite.category.titleize %> • <%= favorite.date.strftime("%b %d") %>
-              </div>
-              <blockquote class="text-gray-800 font-medium">
-                "<%= favorite.content %>"
-              </blockquote>
-            </div>
+      <% if user_signed_in? %>
+        <!-- Category Filter (only for logged in users) -->
+        <div class="flex justify-center mb-8">
+          <%= form_with url: affirmations_path, method: :get, local: true, class: "border-input data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 flex items-center justify-between gap-2 rounded-md px-3 py-2 text-sm whitespace-nowrap transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-9 data-[size=sm]:h-8 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 w-48 bg-white/70 backdrop-blur-sm shadow-lg border-0" do |f| %>
+            <%= f.hidden_field :date, value: @date %>
+            <%= f.select :category,
+                options_for_select([["All Categories", ""]] + @categories.map { |c| [c.titleize, c] }, @selected_category),
+                {},
+                { class: "border rounded px-3 py-2", onchange: "this.form.submit();" } %>
           <% end %>
         </div>
-      </div>
-    <% end %>
+        
+        <!-- Affirmations Display (only for logged in users) -->
+        <div id="affirmations">
+          <%= turbo_stream_from [@current_user, "affirmations"] %>
+          <%= render @affirmations %>
+        </div>
+        
+        <!-- Favorites Section (only for logged in users) -->
+        <% if @favorites&.any? %>
+          <div class="mt-12 pt-8 border-t border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">⭐ Your Favorites</h2>
+            <div class="grid gap-3 md:grid-cols-2">
+              <% @favorites.each do |favorite| %>
+                <div class="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                  <div class="text-sm text-yellow-600 mb-1">
+                    <%= favorite.category.titleize %> • <%= favorite.date.strftime("%b %d") %>
+                  </div>
+                  <blockquote class="text-gray-800 font-medium">
+                    "<%= favorite.content %>"
+                  </blockquote>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <!-- Welcome Section for Non-logged in users -->
+        <div class="text-center py-16">
+          <div class="max-w-2xl mx-auto">
+            <h2 class="text-4xl font-bold text-gray-900 mb-6">
+              Start Your Journey with Daily Affirmations
+            </h2>
+            <p class="text-xl text-gray-600 mb-8">
+              Discover personalized affirmations to boost your confidence, motivation, and positive mindset. 
+              Join thousands of users who start their day with intention and purpose.
+            </p>
+            
+            <!-- Feature Preview -->
+            <div class="grid md:grid-cols-3 gap-6 mb-8">
+              <div class="bg-white/70 backdrop-blur-sm rounded-lg p-6 shadow-lg">
+                <div class="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Personalized Content</h3>
+                <p class="text-gray-600 text-sm">AI-generated affirmations tailored to your goals and preferences</p>
+              </div>
+              
+              <div class="bg-white/70 backdrop-blur-sm rounded-lg p-6 shadow-lg">
+                <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12,6 12,12 16,14"/>
+                  </svg>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Daily Practice</h3>
+                <p class="text-gray-600 text-sm">Build a consistent routine with fresh affirmations every day</p>
+              </div>
+              
+              <div class="bg-white/70 backdrop-blur-sm rounded-lg p-6 shadow-lg">
+                <div class="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7z"/>
+                  </svg>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Save Favorites</h3>
+                <p class="text-gray-600 text-sm">Keep track of affirmations that resonate most with you</p>
+              </div>
+            </div>
+            
+            <!-- Call to Action -->
+            <div class="space-y-4">
+              <%= link_to "Get Started - Sign Up Free", new_registration_path, 
+                  class: "inline-block bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200" %>
+              <div class="text-gray-600">
+                Already have an account? 
+                <%= link_to "Sign in", new_session_path, class: "text-indigo-600 hover:text-indigo-500 font-medium" %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
   </div>
 </div>
 
